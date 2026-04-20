@@ -1,0 +1,34 @@
+formal_pharmacy_task:
+  description: >
+    Analyse les documents du processus formel pharmacie.
+    Identifie les étapes officielles, les sous-processus, les acteurs impliqués,
+    les règles, les validations, les dépendances et les points de vigilance.
+    Ne parle pas des usages réels.
+  expected_output: >
+    Une fiche structurée du processus formel pharmacie :
+    finalité, sous-processus, étapes formelles, acteurs impliqués,
+    règles et validations, dépendances critiques, points de vigilance.
+
+real_pharmacy_task:
+  description: >
+    Analyse les documents des usages réels pharmacie.
+    Décris comment le processus se déroule réellement,
+    identifie les contournements, ajustements, irritants,
+    contraintes terrain et effets observés.
+    Ne propose pas encore de solution.
+  expected_output: >
+    Une fiche structurée des pratiques réelles pharmacie :
+    déroulement réel, acteurs réellement mobilisés, contournements,
+    contraintes opérationnelles, irritants, effets observés.
+
+alignment_pharmacy_task:
+  description: >
+    Compare l'analyse formelle et l'analyse réelle du circuit pharmacie.
+    Identifie les désalignements socio-techniques, qualifie leur nature,
+    formule des hypothèses explicatives, évalue les impacts opérationnels
+    et propose des quick wins ainsi que des actions structurantes.
+  expected_output: >
+    Une note de réalignement pharmacie contenant :
+    synthèse du désalignement, écarts majeurs identifiés,
+    causes probables, impacts opérationnels, quick wins,
+    actions structurantes, point de vigilance de gouvernance.

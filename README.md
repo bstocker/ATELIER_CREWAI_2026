@@ -1,39 +1,62 @@
-# POC CrewAI — Admission & Facturation SIH
-
-Ce POC compare le **processus formel** du circuit admission-facturation avec les **pratiques réelles observées** afin d'identifier les désalignements socio-techniques et de proposer des actions de réalignement.
-
-## Objectif
-
-Produire automatiquement trois livrables :
-- `outputs/analyse_formelle.md`
-- `outputs/analyse_reelle.md`
-- `outputs/rapport_realignement.md`
-
-## Agents
-
-1. **Analyste du processus formel**
-2. **Analyste des pratiques réelles**
-3. **Analyste de réalignement socio-technique**
-
-## Lancement local
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-# renseigner OPENAI_API_KEY dans .env
-python src/main.py
+# Prérequis
+```
+sudo apt-get update
+sudo apt-get install -y tesseract-ocr tesseract-ocr-fra poppler-utils
+```
+# Execution
+```
+Exécuter plusieurs modules depuis le runner principal
+python src/main.py --modules admission
+python src/main.py --modules pharmacie
+python src/main.py --modules admission pharmacie
+python src/main.py --all
+```
+# Variables
+```
+OPENAI_API_KEY=ta_cle_api
+OPENAI_MODEL=gpt-4o-mini
 ```
 
-## Lancement dans GitHub Codespaces
+# Le répertoire formal du module concerné doit contenir :
+* procédures
+* modes opératoires
+* organigrammes
+* règles de gestion
+* cartographies processus
+* politiques qualité
+* référentiels
 
-Le projet contient un `.devcontainer/devcontainer.json`.
-Une fois le Codespace démarré :
+# Le répertoire real représente le terrain :
+* scans
+* formulaires remplis
+* mails
+* extractions Excel
+* incidents
+* notes utilisateurs
+* comptes rendus
+* photos
+* traces opérationnelles
 
-```bash
-pip install -r requirements.txt
-cp .env.example .env
-# renseigner OPENAI_API_KEY dans .env ou dans les secrets Codespaces
-python src/main.py
-```
+# le cadre cognitif de l’agent (fichier agents_xxxxx.yaml) définit :
+* rôle
+* objectif
+* posture
+* angle d’analyse
+* niveau d’exigence
+* vocabulaire métier
+* limites
+
+# Le prompt agent doit définir :
+- qui parle ?
+- avec quelle expertise ?
+- dans quel objectif ?
+- avec quel niveau d’exigence ?
+
+# Les prompts dans tasks.yaml définissent les commandes opérationnelle.
+Une bonne task précise :
+* ce qu’il faut produire ;
+* la structure attendue ;
+* le niveau de détail ;
+* les critères ;
+* les exclusions ;
+* le format de sortie.

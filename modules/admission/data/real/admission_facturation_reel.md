@@ -8,5 +8,3 @@
 - Certaines prestations sont imputées avec retard.
 - La pharmacie dispensée n'est pas toujours rapprochée immédiatement du dossier administratif.
 - Les contrôles avant facturation peuvent être réalisés tardivement.
-- Les équipes estiment que le circuit complet est perçu comme trop rigide en situation de charge.
-- Des doubles saisies et vérifications redondantes ont été signalées.

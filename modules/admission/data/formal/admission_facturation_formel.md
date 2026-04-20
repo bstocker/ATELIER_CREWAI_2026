@@ -1,11 +1,9 @@
 # Processus formel — Admission & facturation
 
 ## Finalité
-Assurer une admission administrative complète et fiable du patient,
-puis alimenter correctement le processus de facturation.
+Assurer une admission administrative complète et fiable du patient, puis alimenter correctement le processus de facturation.
 
 ## Fonctionnalités ordonnées
-
 ### 1. Gestion de l'identité patient
 - F2 Rechercher identité patient
 - F1 Créer identité patient
@@ -39,11 +37,3 @@ puis alimenter correctement le processus de facturation.
 ### 6. Facturation
 - F19 Générer la facture
 - F22 Générer la facture
-
-## Règles attendues
-- L'identité du patient doit être recherchée avant toute création.
-- Les informations administratives doivent être fiables et complètes.
-- Toute admission incomplète doit être régularisée.
-- Les prestations et la pharmacie doivent être imputées avant facturation.
-- Les imputations doivent être vérifiées avant émission de la facture.
-- Toute annulation ou fusion doit être tracée.
