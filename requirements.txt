@@ -1,0 +1,9 @@
+crewai>=0.36.0
+python-dotenv>=1.0.1
+pyyaml>=6.0.1
+litellm>=1.41.0
+pypdf>=4.2.0
+python-docx>=1.1.2
+openpyxl>=3.1.5
+python-pptx>=1.0.2
+Pillow>=10.4.0
