@@ -11,12 +11,15 @@ OUTPUT_DIR = BASE_DIR / "outputs"
 
 load_dotenv()
 
+
 def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
+
 
 def load_yaml(path: Path) -> dict:
     with path.open("r", encoding="utf-8") as f:
         return yaml.safe_load(f)
+
 
 def build_llm() -> LLM:
     model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
@@ -24,6 +27,7 @@ def build_llm() -> LLM:
     if not api_key:
         raise ValueError("OPENAI_API_KEY introuvable. Renseigne-le dans .env ou les secrets.")
     return LLM(model=model, api_key=api_key)
+
 
 def build_agents(llm, agents_cfg):
     formal_agent = Agent(
@@ -34,6 +38,7 @@ def build_agents(llm, agents_cfg):
         verbose=True,
         allow_delegation=False,
     )
+
     real_agent = Agent(
         role=agents_cfg["real_analyst"]["role"],
         goal=agents_cfg["real_analyst"]["goal"],
@@ -42,6 +47,7 @@ def build_agents(llm, agents_cfg):
         verbose=True,
         allow_delegation=False,
     )
+
     alignment_agent = Agent(
         role=agents_cfg["alignment_analyst"]["role"],
         goal=agents_cfg["alignment_analyst"]["goal"],
@@ -50,7 +56,17 @@ def build_agents(llm, agents_cfg):
         verbose=True,
         allow_delegation=False,
     )
+
     return formal_agent, real_agent, alignment_agent
+
+
+def save_output(path: Path, content) -> None:
+    if content is None:
+        text = ""
+    else:
+        text = str(content)
+    path.write_text(text, encoding="utf-8")
+
 
 def main():
     OUTPUT_DIR.mkdir(exist_ok=True)
@@ -68,14 +84,12 @@ def main():
         description=tasks_cfg["formal_task"]["description"] + "\n\nDocument source :\n" + formal_input,
         expected_output=tasks_cfg["formal_task"]["expected_output"],
         agent=formal_agent,
-        output_file=str(OUTPUT_DIR / "analyse_formelle.md"),
     )
 
     real_task = Task(
         description=tasks_cfg["real_task"]["description"] + "\n\nDocument source :\n" + real_input,
         expected_output=tasks_cfg["real_task"]["expected_output"],
         agent=real_agent,
-        output_file=str(OUTPUT_DIR / "analyse_reelle.md"),
     )
 
     alignment_task = Task(
@@ -83,7 +97,6 @@ def main():
         expected_output=tasks_cfg["alignment_task"]["expected_output"],
         agent=alignment_agent,
         context=[formal_task, real_task],
-        output_file=str(OUTPUT_DIR / "rapport_realignement.md"),
     )
 
     crew = Crew(
@@ -94,8 +107,16 @@ def main():
     )
 
     result = crew.kickoff()
+
+    # Sauvegarde explicite des sorties
+    save_output(OUTPUT_DIR / "analyse_formelle.md", getattr(formal_task, "output", ""))
+    save_output(OUTPUT_DIR / "analyse_reelle.md", getattr(real_task, "output", ""))
+    save_output(OUTPUT_DIR / "rapport_realignement.md", getattr(alignment_task, "output", result))
+
     print("\n=== Exécution terminée ===")
     print(result)
+    print(f"\nFichiers générés dans : {OUTPUT_DIR}")
+
 
 if __name__ == "__main__":
     main()
