@@ -66,19 +66,22 @@ def _read_text_file(path: Path) -> str:
 
 def _read_pdf(path: Path) -> str:
     reader = PdfReader(str(path))
-    parts = []
+
+    raw_texts = []
+    formatted_parts = []
 
     for i, page in enumerate(reader.pages, start=1):
         text = page.extract_text() or ""
-        parts.append(f"\n--- PDF page {i}: {path.name} ---\n{text}")
+        raw_texts.append(text)
+        formatted_parts.append(f"\n--- PDF page {i}: {path.name} ---\n{text}")
 
-    native_text = "\n".join(parts)
+    raw_joined = "\n".join(raw_texts).strip()
 
-    # Si texte exploitable -> on garde
-    if _is_text_usable(native_text):
-        return native_text
+    # Si le vrai texte extrait du PDF est exploitable, on le garde
+    if _is_text_usable(raw_joined):
+        return "\n".join(formatted_parts)
 
-    # Sinon OCR
+    # Sinon on bascule sur OCR
     return _ocr_pdf(path)
 
 
