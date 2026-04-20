@@ -1,108 +1,321 @@
+from __future__ import annotations
+
 from pathlib import Path
+from typing import Iterable
 import csv
 import xml.etree.ElementTree as ET
+
 from pypdf import PdfReader
+from PIL import Image
+import pytesseract
 from docx import Document
 from openpyxl import load_workbook
 from pptx import Presentation
 
+from src.loaders.admission_ocr_loader import extract_text_with_simple_ocr
+
+
+# --------------------------------------------------
+# EXTENSIONS
+# --------------------------------------------------
+
 TEXT_EXTENSIONS = {".md", ".txt", ".csv", ".xml"}
+
 SUPPORTED_EXTENSIONS = {
-    ".pdf", ".xlsx", ".xls", ".docx", ".png", ".jpg", ".jpeg", ".webp",
-    ".xml", ".csv", ".md", ".txt", ".pptx", ".wav", ".mp3", ".m4a"
+    ".pdf",
+    ".xlsx",
+    ".xls",
+    ".docx",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".webp",
+    ".xml",
+    ".csv",
+    ".md",
+    ".txt",
+    ".pptx",
+    ".wav",
+    ".mp3",
+    ".m4a",
 }
 
-def _read_text_file(path: Path) -> str:
-    return path.read_text(encoding="utf-8", errors="ignore")
 
-def _read_pdf(path: Path) -> str:
-    reader = PdfReader(str(path))
-    parts = []
-    for i, page in enumerate(reader.pages, start=1):
-        text = page.extract_text() or ""
-        parts.append(f"\n--- PDF page {i}: {path.name} ---\n{text}")
-    return "\n".join(parts)
+# --------------------------------------------------
+# OUTILS GÉNÉRAUX
+# --------------------------------------------------
 
-def _read_docx(path: Path) -> str:
-    doc = Document(str(path))
-    return "\n".join(p.text for p in doc.paragraphs if p.text.strip())
+def _is_text_usable(text: str, min_chars: int = 80, min_words: int = 15) -> bool:
+    if not text:
+        return False
 
-def _read_xlsx(path: Path) -> str:
-    wb = load_workbook(str(path), data_only=True)
-    chunks = []
-    for ws in wb.worksheets:
-        chunks.append(f"\n--- Sheet: {ws.title} ({path.name}) ---")
-        for row in ws.iter_rows(values_only=True):
-            vals = ["" if v is None else str(v) for v in row]
-            if any(v.strip() for v in vals):
-                chunks.append(" | ".join(vals))
-    return "\n".join(chunks)
+    text = text.strip()
+    if len(text) < min_chars:
+        return False
 
-def _read_csv(path: Path) -> str:
+    if len(text.split()) < min_words:
+        return False
+
+    return True
+
+
+# --------------------------------------------------
+# TXT / MD
+# --------------------------------------------------
+
+def _load_text(file_path: Path) -> str:
+    return file_path.read_text(encoding="utf-8", errors="ignore")
+
+
+# --------------------------------------------------
+# CSV
+# --------------------------------------------------
+
+def _load_csv(file_path: Path) -> str:
     rows = []
-    with path.open("r", encoding="utf-8", errors="ignore", newline="") as f:
+
+    with open(file_path, newline="", encoding="utf-8", errors="ignore") as f:
         reader = csv.reader(f)
         for row in reader:
             rows.append(" | ".join(row))
+
     return "\n".join(rows)
 
-def _read_xml(path: Path) -> str:
-    tree = ET.parse(str(path))
-    root = tree.getroot()
-    chunks = [f"XML root: {root.tag}"]
-    for elem in root.iter():
-        text = (elem.text or "").strip()
-        if text:
-            chunks.append(f"{elem.tag}: {text}")
-    return "\n".join(chunks)
 
-def _read_pptx(path: Path) -> str:
-    prs = Presentation(str(path))
-    chunks = []
-    for i, slide in enumerate(prs.slides, start=1):
-        chunks.append(f"\n--- Slide {i}: {path.name} ---")
-        for shape in slide.shapes:
-            if hasattr(shape, "text") and shape.text.strip():
-                chunks.append(shape.text.strip())
-    return "\n".join(chunks)
+# --------------------------------------------------
+# XML
+# --------------------------------------------------
 
-def _read_image_placeholder(path: Path) -> str:
-    return f"[IMAGE PLACEHOLDER] Fichier image détecté: {path.name}. Ajouter un OCR ou un modèle vision pour extraction détaillée."
+def _load_xml(file_path: Path) -> str:
+    try:
+        tree = ET.parse(file_path)
+        root = tree.getroot()
+        return ET.tostring(root, encoding="unicode")
+    except Exception as exc:
+        return f"[ERREUR XML : {exc}]"
 
-def _read_audio_placeholder(path: Path) -> str:
-    return f"[AUDIO PLACEHOLDER] Fichier audio détecté: {path.name}. Brancher un moteur de transcription pour extraire le contenu."
 
-def load_file(path: Path) -> str:
-    ext = path.suffix.lower()
-    if ext in {".md", ".txt"}:
-        return _read_text_file(path)
-    if ext == ".pdf":
-        return _read_pdf(path)
-    if ext == ".docx":
-        return _read_docx(path)
-    if ext in {".xlsx", ".xls"}:
-        return _read_xlsx(path)
-    if ext == ".csv":
-        return _read_csv(path)
-    if ext == ".xml":
-        return _read_xml(path)
-    if ext == ".pptx":
-        return _read_pptx(path)
-    if ext in {".png", ".jpg", ".jpeg", ".webp"}:
-        return _read_image_placeholder(path)
-    if ext in {".wav", ".mp3", ".m4a"}:
-        return _read_audio_placeholder(path)
-    return f"[UNSUPPORTED] {path.name}"
+# --------------------------------------------------
+# PDF STRUCTURÉ
+# --------------------------------------------------
 
-def load_directory_contents(directory: Path) -> str:
-    if not directory.exists():
-        return ""
-    chunks = []
-    files = sorted([p for p in directory.rglob("*") if p.is_file()])
-    for path in files:
-        chunks.append(f"\n====================\nSOURCE: {path.name}\nTYPE: {path.suffix.lower()}\n====================")
+def _extract_text_from_pdf(file_path: Path) -> str:
+    reader = PdfReader(str(file_path))
+    pages = []
+
+    for i, page in enumerate(reader.pages, start=1):
         try:
-            chunks.append(load_file(path))
-        except Exception as e:
-            chunks.append(f"[ERROR] Impossible de lire {path.name}: {e}")
-    return "\n".join(chunks)
+            text = page.extract_text() or ""
+            pages.append(f"\n--- PAGE {i} ---\n{text.strip()}")
+        except Exception as exc:
+            pages.append(f"\n--- PAGE {i} ---\n[ERREUR PDF : {exc}]")
+
+    return "\n".join(pages).strip()
+
+
+# --------------------------------------------------
+# IMAGE OCR
+# --------------------------------------------------
+
+def _load_image_with_ocr(file_path: Path, lang: str = "fra") -> str:
+    try:
+        img = Image.open(file_path)
+        return pytesseract.image_to_string(img, lang=lang)
+    except Exception as exc:
+        return f"[ERREUR OCR IMAGE : {exc}]"
+
+
+# --------------------------------------------------
+# DOCX
+# --------------------------------------------------
+
+def _load_docx(file_path: Path) -> str:
+    try:
+        doc = Document(str(file_path))
+        return "\n".join(p.text for p in doc.paragraphs if p.text.strip())
+    except Exception as exc:
+        return f"[ERREUR DOCX : {exc}]"
+
+
+# --------------------------------------------------
+# XLSX / XLS
+# --------------------------------------------------
+
+def _load_excel(file_path: Path) -> str:
+    try:
+        wb = load_workbook(filename=file_path, data_only=True)
+        output = []
+
+        for ws in wb.worksheets:
+            output.append(f"\n### FEUILLE : {ws.title}")
+
+            for row in ws.iter_rows(values_only=True):
+                values = [str(v) if v is not None else "" for v in row]
+                if any(values):
+                    output.append(" | ".join(values))
+
+        return "\n".join(output)
+
+    except Exception as exc:
+        return f"[ERREUR EXCEL : {exc}]"
+
+
+# --------------------------------------------------
+# PPTX
+# --------------------------------------------------
+
+def _load_pptx(file_path: Path) -> str:
+    try:
+        prs = Presentation(str(file_path))
+        slides = []
+
+        for i, slide in enumerate(prs.slides, start=1):
+            slides.append(f"\n### SLIDE {i}")
+
+            for shape in slide.shapes:
+                if hasattr(shape, "text"):
+                    txt = shape.text.strip()
+                    if txt:
+                        slides.append(txt)
+
+        return "\n".join(slides)
+
+    except Exception as exc:
+        return f"[ERREUR PPTX : {exc}]"
+
+
+# --------------------------------------------------
+# AUDIO (placeholder)
+# --------------------------------------------------
+
+def _load_audio(file_path: Path) -> str:
+    return f"[FICHIER AUDIO DÉTECTÉ : {file_path.name} - transcription non activée]"
+
+
+# --------------------------------------------------
+# CHARGEMENT UNIQUE
+# --------------------------------------------------
+
+def load_single_file(
+    file_path: str | Path,
+    enable_ocr: bool = False,
+    ocr_lang: str = "fra",
+) -> str:
+
+    file_path = Path(file_path)
+    suffix = file_path.suffix.lower()
+
+    if suffix not in SUPPORTED_EXTENSIONS:
+        raise ValueError(f"Format non supporté : {suffix}")
+
+    # TXT / MD
+    if suffix in {".txt", ".md"}:
+        return _load_text(file_path)
+
+    # CSV
+    if suffix == ".csv":
+        return _load_csv(file_path)
+
+    # XML
+    if suffix == ".xml":
+        return _load_xml(file_path)
+
+    # PDF
+    if suffix == ".pdf":
+        native_text = _extract_text_from_pdf(file_path)
+
+        if _is_text_usable(native_text):
+            return native_text
+
+        if enable_ocr:
+            return extract_text_with_simple_ocr(
+                file_path=file_path,
+                lang=ocr_lang
+            )
+
+        return native_text
+
+    # Images
+    if suffix in {".png", ".jpg", ".jpeg", ".webp"}:
+        if enable_ocr:
+            return _load_image_with_ocr(file_path, lang=ocr_lang)
+        return f"[IMAGE DÉTECTÉE : {file_path.name}]"
+
+    # DOCX
+    if suffix == ".docx":
+        return _load_docx(file_path)
+
+    # Excel
+    if suffix in {".xlsx", ".xls"}:
+        return _load_excel(file_path)
+
+    # PPTX
+    if suffix == ".pptx":
+        return _load_pptx(file_path)
+
+    # Audio
+    if suffix in {".wav", ".mp3", ".m4a"}:
+        return _load_audio(file_path)
+
+    return ""
+
+
+# --------------------------------------------------
+# PARCOURS RÉPERTOIRE
+# --------------------------------------------------
+
+def iter_files(directory: str | Path) -> Iterable[Path]:
+    directory = Path(directory)
+
+    if not directory.exists():
+        return []
+
+    return sorted(
+        [
+            p for p in directory.rglob("*")
+            if p.is_file() and p.suffix.lower() in SUPPORTED_EXTENSIONS
+        ]
+    )
+
+
+# --------------------------------------------------
+# CHARGEMENT DOSSIER
+# --------------------------------------------------
+
+def load_directory(
+    directory: str | Path,
+    enable_ocr: bool = False,
+    ocr_lang: str = "fra",
+) -> str:
+
+    files = list(iter_files(directory))
+
+    if not files:
+        return ""
+
+    chunks = []
+
+    for file_path in files:
+        try:
+            content = load_single_file(
+                file_path=file_path,
+                enable_ocr=enable_ocr,
+                ocr_lang=ocr_lang,
+            )
+
+            chunks.append(
+                f"\n==================================================\n"
+                f"FICHIER : {file_path}\n"
+                f"==================================================\n"
+                f"{content}\n"
+            )
+
+        except Exception as exc:
+            chunks.append(
+                f"\n==================================================\n"
+                f"FICHIER : {file_path}\n"
+                f"==================================================\n"
+                f"[ERREUR : {exc}]\n"
+            )
+
+    return "\n".join(chunks).strip()
