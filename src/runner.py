@@ -44,12 +44,12 @@ MODULE_CONFIG = {
         "output_dir": BASE_DIR / "modules" / "bloc" / "outputs",
         "agents_file": CONFIG_DIR / "agents_bloc.yaml",
         "tasks_file": CONFIG_DIR / "tasks_bloc.yaml",
-        "formal_agent_key": "formal_bloc_analyst",
-        "real_agent_key": "real_bloc_analyst",
-        "alignment_agent_key": "alignment_bloc_analyst",
-        "formal_task_key": "formal_bloc_task",
-        "real_task_key": "real_bloc_task",
-        "alignment_task_key": "alignment_bloc_task",
+        "formal_agent_key": "formal_analyst",
+        "real_agent_key": "real_analyst",
+        "alignment_agent_key": "alignment_analyst",
+        "formal_task_key": "formal_task",
+        "real_task_key": "real_task",
+        "alignment_task_key": "alignment_task",
     },
 }
 
