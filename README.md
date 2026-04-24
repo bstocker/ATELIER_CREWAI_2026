@@ -20,10 +20,14 @@ python src/main.py --transversal
 ```
 # Variables
 ```
+DEVELOPPEMENT :
+OPENAI_MODEL_MINI=gpt-4o-mini
+OPENAI_MODEL_STRONG=gpt-4o-mini
+
+PRODUCTION
 OPENAI_MODEL_MINI=gpt-4o-mini
 OPENAI_MODEL_STRONG=gpt-4o
 ```
-
 # Le répertoire formal du module concerné doit contenir :
 * procédures
 * modes opératoires
