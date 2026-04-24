@@ -83,12 +83,18 @@ def load_yaml(path: Path) -> dict:
     return data
 
 
-def build_llm() -> LLM:
-    model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+def build_llm(profile: str = "mini") -> LLM:
     api_key = os.getenv("OPENAI_API_KEY")
 
     if not api_key:
-        raise ValueError("OPENAI_API_KEY introuvable. Renseigne-le dans .env ou les secrets.")
+        raise ValueError("OPENAI_API_KEY introuvable. Renseigne-le dans .env ou secrets.")
+
+    if profile == "strong":
+        model = os.getenv("OPENAI_MODEL_STRONG", "gpt-4o")
+    else:
+        model = os.getenv("OPENAI_MODEL_MINI", "gpt-4o-mini")
+
+    print(f"[LLM] Profil={profile} | Modèle={model}")
 
     return LLM(
         model=model,
@@ -103,7 +109,7 @@ def save_output(path: Path, content) -> None:
 
 def make_agent(cfg: dict, key: str, llm: LLM) -> Agent:
     if key not in cfg:
-        raise KeyError(f"Agent '{key}' introuvable dans le fichier YAML.")
+        raise KeyError(f"Agent '{key}' introuvable dans le YAML.")
 
     return Agent(
         role=cfg[key]["role"],
@@ -123,7 +129,7 @@ def make_task(
     context: list | None = None,
 ) -> Task:
     if task_key not in tasks_cfg:
-        raise KeyError(f"Tâche '{task_key}' introuvable dans le fichier YAML.")
+        raise KeyError(f"Tâche '{task_key}' introuvable dans le YAML.")
 
     description = tasks_cfg[task_key]["description"]
 
@@ -144,9 +150,14 @@ def run_module(module_name: str):
 
     cfg = MODULE_CONFIG[module_name]
 
+    print(f"\n===== Lancement module : {module_name.upper()} =====")
+
     agents_cfg = load_yaml(cfg["agents_file"])
     tasks_cfg = load_yaml(cfg["tasks_file"])
-    llm = build_llm()
+
+    formal_llm = build_llm("mini")
+    real_llm = build_llm("mini")
+    alignment_llm = build_llm("strong")
 
     formal_input = load_directory_contents(cfg["formal_dir"])
     real_input = load_directory_contents(cfg["real_dir"])
@@ -154,9 +165,9 @@ def run_module(module_name: str):
     output_dir = cfg["output_dir"]
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    formal_agent = make_agent(agents_cfg, cfg["formal_agent_key"], llm)
-    real_agent = make_agent(agents_cfg, cfg["real_agent_key"], llm)
-    alignment_agent = make_agent(agents_cfg, cfg["alignment_agent_key"], llm)
+    formal_agent = make_agent(agents_cfg, cfg["formal_agent_key"], formal_llm)
+    real_agent = make_agent(agents_cfg, cfg["real_agent_key"], real_llm)
+    alignment_agent = make_agent(agents_cfg, cfg["alignment_agent_key"], alignment_llm)
 
     formal_task = make_task(
         tasks_cfg=tasks_cfg,
@@ -190,7 +201,10 @@ def run_module(module_name: str):
 
     save_output(output_dir / "analyse_formelle.md", getattr(formal_task, "output", ""))
     save_output(output_dir / "analyse_reelle.md", getattr(real_task, "output", ""))
-    save_output(output_dir / "rapport_realignement.md", getattr(alignment_task, "output", result))
+    save_output(
+        output_dir / "rapport_realignement.md",
+        getattr(alignment_task, "output", result),
+    )
 
     print(f"\n=== Exécution {module_name} terminée ===")
     print(f"Fichiers générés dans : {output_dir}")
@@ -219,18 +233,21 @@ def collect_alignment_reports() -> str:
                 f"MODULE : {module_name.upper()}\n"
                 f"RAPPORT ABSENT\n"
                 f"====================\n\n"
-                f"Aucun rapport de réalignement trouvé pour ce module."
+                f"Aucun rapport disponible."
             )
 
     return "\n".join(reports)
 
 
 def run_transversal_consolidation():
+    print("\n===== Lancement consolidation transverse =====")
+
     cfg = TRANSVERSAL_CONFIG
 
     agents_cfg = load_yaml(cfg["agents_file"])
     tasks_cfg = load_yaml(cfg["tasks_file"])
-    llm = build_llm()
+
+    transversal_llm = build_llm("strong")
 
     output_dir = cfg["output_dir"]
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -238,9 +255,13 @@ def run_transversal_consolidation():
     consolidated_input = collect_alignment_reports()
 
     if not consolidated_input.strip():
-        raise ValueError("Aucun rapport de réalignement disponible pour la consolidation transverse.")
+        raise ValueError("Aucun rapport disponible pour consolidation.")
 
-    transversal_agent = make_agent(agents_cfg, cfg["agent_key"], llm)
+    transversal_agent = make_agent(
+        agents_cfg,
+        cfg["agent_key"],
+        transversal_llm,
+    )
 
     transversal_task = make_task(
         tasks_cfg=tasks_cfg,
