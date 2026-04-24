@@ -20,8 +20,8 @@ python src/main.py --transversal
 ```
 # Variables
 ```
-OPENAI_API_KEY=ta_cle_api
-OPENAI_MODEL=gpt-4o-mini
+OPENAI_MODEL_MINI=gpt-4o-mini
+OPENAI_MODEL_STRONG=gpt-4o
 ```
 
 # Le répertoire formal du module concerné doit contenir :
