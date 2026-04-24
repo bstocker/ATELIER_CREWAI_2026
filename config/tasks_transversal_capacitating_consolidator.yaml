@@ -1,0 +1,155 @@
+transversal_consolidation_task:
+  description: >
+    Lire l'ensemble des notes de réalignement produites par les modules métier du SIH.
+    Chaque note de réalignement contient normalement : une synthèse du désalignement,
+    les écarts majeurs identifiés, les causes probables, les impacts opérationnels,
+    les quick wins, les actions structurantes et les points de vigilance de gouvernance.
+
+    A partir de ces notes, produire une consolidation transverse permettant de comprendre
+    les désalignements socio-techniques du SIH à l'échelle globale de l'établissement.
+
+    L'analyse doit notamment :
+    1. Identifier les désalignements récurrents entre plusieurs modules.
+    2. Distinguer les écarts locaux, les écarts transverses et les écarts systémiques.
+    3. Regrouper les causes probables par grandes familles : organisationnelles,
+       fonctionnelles, techniques, humaines, formation, paramétrage, gouvernance,
+       coordination interservices, arbitrage décisionnel.
+    4. Identifier les impacts opérationnels consolidés : qualité de prise en charge,
+       continuité du parcours patient, charge de travail, double saisie, qualité des données,
+       délais, coordination, facturation, traçabilité, sécurité ou conformité.
+    5. Repérer les dépendances intermodules : par exemple admission vers facturation,
+       prescription vers pharmacie, identité patient vers soins, urgences vers hospitalisation,
+       stocks vers dispensation.
+    6. Consolider les quick wins en supprimant les doublons et en distinguant les actions
+       immédiatement activables des actions nécessitant arbitrage.
+    7. Consolider les actions structurantes dans une feuille de route transverse.
+    8. Identifier les points de vigilance de gouvernance qui dépassent un module particulier.
+    9. Produire une lecture selon les quatre dimensions du contrôle capacitant :
+       transparence interne, transparence globale, flexibilité, réparation.
+    10. Formuler les conditions de mise en place d'un dialogue capacitant entre métiers,
+        DSI, management, référents SIH et utilisateurs terrain.
+
+    Le livrable attendu doit être rédigé en français, dans un style professionnel,
+    structuré, synthétique mais suffisamment détaillé pour être exploitable en comité
+    de pilotage SIH.
+
+  expected_output: >
+    Un rapport de consolidation transverse en Markdown comprenant obligatoirement
+    les sections suivantes :
+
+    # Rapport de consolidation capacitant transverse du SIH
+
+    ## 1. Synthèse exécutive
+    Présenter les principaux constats transverses en quelques paragraphes.
+    Mettre en évidence les désalignements majeurs, les risques principaux et les
+    décisions prioritaires attendues.
+
+    ## 2. Périmètre des modules analysés
+    Lister les modules dont les notes de réalignement ont été prises en compte.
+    Signaler les limites éventuelles du corpus si certaines notes sont absentes,
+    incomplètes ou insuffisamment documentées.
+
+    ## 3. Désalignements récurrents et systémiques
+    Identifier les désalignements qui apparaissent dans plusieurs modules.
+    Distinguer :
+    - écarts locaux ;
+    - écarts transverses ;
+    - écarts systémiques.
+
+    ## 4. Matrice consolidée des écarts
+    Produire un tableau avec les colonnes suivantes :
+    - Désalignement constaté
+    - Modules concernés
+    - Nature de l'écart
+    - Causes probables
+    - Impacts opérationnels
+    - Niveau de criticité
+    - Priorité de traitement
+
+    ## 5. Analyse consolidée des causes racines
+    Regrouper les causes par familles :
+    - organisationnelles ;
+    - fonctionnelles ;
+    - techniques ;
+    - humaines ;
+    - formation et appropriation ;
+    - paramétrage SIH ;
+    - gouvernance ;
+    - coordination interservices ;
+    - arbitrages manquants.
+
+    ## 6. Cartographie des dépendances intermodules
+    Identifier les effets de chaîne entre modules.
+    Expliquer comment un désalignement dans un module peut produire des impacts
+    dans un autre module.
+
+    ## 7. Analyse capacitant transverse
+    Analyser les constats selon les quatre dimensions du contrôle capacitant :
+    - transparence interne ;
+    - transparence globale ;
+    - flexibilité ;
+    - réparation.
+
+    Pour chaque dimension, indiquer :
+    - les forces observées ;
+    - les fragilités observées ;
+    - les conséquences opérationnelles ;
+    - les recommandations associées.
+
+    ## 8. Dialogue capacitant et gouvernance
+    Identifier les conditions nécessaires à un dialogue capacitant durable.
+    Analyser les besoins de proximité :
+    - proximité organisationnelle ;
+    - proximité cognitive ;
+    - proximité technique.
+
+    Proposer les mécanismes de gouvernance adaptés : comités, référents, circuits
+    d'escalade, arbitrages, ateliers métiers/SI, boucle de feedback terrain.
+
+    ## 9. Quick wins transverses
+    Consolider les quick wins proposés dans les modules.
+    Produire un tableau avec :
+    - Action immédiate
+    - Modules concernés
+    - Effet attendu
+    - Responsable pressenti
+    - Difficulté de mise en œuvre
+    - Délai indicatif
+
+    ## 10. Actions structurantes et feuille de route
+    Proposer une feuille de route consolidée structurée en trois horizons :
+    - 0 à 30 jours ;
+    - 30 à 90 jours ;
+    - 3 à 12 mois.
+
+    Distinguer les actions relevant :
+    - du paramétrage SIH ;
+    - de la clarification des processus ;
+    - de la formation ;
+    - de la gouvernance ;
+    - de la coordination interservices ;
+    - de la relation avec l'éditeur ou l'intégrateur.
+
+    ## 11. Points de vigilance pour la Direction et le pilotage SIH
+    Présenter les sujets nécessitant un arbitrage ou une attention particulière
+    de la Direction, de la DSI, de l'AMOA ou des responsables métiers.
+
+    ## 12. Indicateurs de suivi proposés
+    Proposer des KPI permettant de piloter le réalignement socio-technique :
+    - nombre d'écarts ouverts / clôturés ;
+    - délai moyen de traitement des irritants ;
+    - taux de double saisie ;
+    - taux d'utilisation effective des fonctionnalités ;
+    - taux d'incidents récurrents ;
+    - satisfaction utilisateurs ;
+    - qualité des données ;
+    - nombre d'arbitrages en attente ;
+    - nombre d'actions quick wins réalisées.
+
+    ## 13. Conclusion
+    Formuler une conclusion claire sur le niveau global de désalignement,
+    les leviers prioritaires de réalignement et les conditions de mise en place
+    d'un contrôle capacitant durable.
+
+  agent: transversal_capacitating_consolidator
+  output_file: modules/transversal/outputs/rapport_consolidation_capacitante_transverse.md
