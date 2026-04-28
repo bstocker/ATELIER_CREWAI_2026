@@ -1,4 +1,5 @@
 import os
+import shutil
 from pathlib import Path
 
 import yaml
@@ -59,6 +60,8 @@ MODULE_CONFIG = {
 }
 
 
+EXAMPLES_DIR = BASE_DIR / "examples"
+
 TRANSVERSAL_CONFIG = {
     "output_dir": BASE_DIR / "transversal" / "outputs",
     "agents_file": CONFIG_DIR / "agents_transversal_capacitating_consolidator.yaml",
@@ -117,6 +120,70 @@ def save_output(path: Path, content) -> None:
     else:
         text = str(content)
     path.write_text(text, encoding="utf-8")
+
+
+EXAMPLE_FILES = {
+    "formal": "analyse_formelle_example.md",
+    "real": "analyse_reelle_example.md",
+    "alignment": "rapport_realignement_example.md",
+    "transversal": "rapport_consolidation_example.md",
+}
+
+
+def load_example(scope: str, task_type: str) -> str:
+    filename = EXAMPLE_FILES.get(task_type, "")
+    if not filename:
+        return ""
+    path = EXAMPLES_DIR / scope / filename
+    if not path.exists():
+        return ""
+    print(f"[FEW-SHOT] Exemple chargé : examples/{scope}/{filename}")
+    return path.read_text(encoding="utf-8")
+
+
+def _wrap_few_shot(example: str) -> str:
+    if not example:
+        return ""
+    return (
+        "\n\n=== EXEMPLE DE RÉFÉRENCE (rapport validé) ===\n"
+        + example
+        + "\n=== FIN DE L'EXEMPLE ===\n\n"
+        "Produis un rapport de même niveau de détail et de structure."
+    )
+
+
+def validate_module(module_name: str) -> None:
+    if module_name not in MODULE_CONFIG:
+        raise ValueError(f"Module inconnu : {module_name}")
+    cfg = MODULE_CONFIG[module_name]
+    example_dir = EXAMPLES_DIR / module_name
+    example_dir.mkdir(parents=True, exist_ok=True)
+    mappings = [
+        ("analyse_formelle.md", EXAMPLE_FILES["formal"]),
+        ("analyse_reelle.md", EXAMPLE_FILES["real"]),
+        ("rapport_realignement.md", EXAMPLE_FILES["alignment"]),
+    ]
+    for src_name, dst_name in mappings:
+        src = cfg["output_dir"] / src_name
+        if src.exists():
+            shutil.copy2(src, example_dir / dst_name)
+            print(f"[VALIDATE] {src_name} → examples/{module_name}/{dst_name}")
+        else:
+            print(f"[VALIDATE] AVERTISSEMENT : {src_name} introuvable, ignoré")
+    print(f"[VALIDATE] Module '{module_name}' validé comme exemple few-shot.")
+
+
+def validate_transversal() -> None:
+    example_dir = EXAMPLES_DIR / "transversal"
+    example_dir.mkdir(parents=True, exist_ok=True)
+    src = TRANSVERSAL_CONFIG["output_dir"] / "rapport_consolidation_transverse.md"  # type: ignore[index]
+    if src.exists():
+        dst = example_dir / EXAMPLE_FILES["transversal"]
+        shutil.copy2(src, dst)
+        print(f"[VALIDATE] rapport_consolidation_transverse.md → examples/transversal/{EXAMPLE_FILES['transversal']}")
+    else:
+        print("[VALIDATE] AVERTISSEMENT : rapport transversal introuvable, ignoré")
+    print("[VALIDATE] Transversal validé comme exemple few-shot.")
 
 
 def _get_output_text(task_output) -> str:
@@ -224,7 +291,8 @@ def run_module(module_name: str):
         task_key=cfg["formal_task_key"],
         agent=formal_agent,
         additional_description=(
-            "Documents formels disponibles via l'outil 'Accès documents formels' :\n"
+            _wrap_few_shot(load_example(module_name, "formal"))
+            + "\nDocuments formels disponibles via l'outil 'Accès documents formels' :\n"
             + _make_file_listing(cfg["formal_dir"])
             + "\n\nUtilise l'outil pour lire les documents et effectuer ton analyse."
         ),
@@ -235,7 +303,8 @@ def run_module(module_name: str):
         task_key=cfg["real_task_key"],
         agent=real_agent,
         additional_description=(
-            "Documents réels disponibles via l'outil 'Accès documents réels' :\n"
+            _wrap_few_shot(load_example(module_name, "real"))
+            + "\nDocuments réels disponibles via l'outil 'Accès documents réels' :\n"
             + _make_file_listing(cfg["real_dir"])
             + "\n\nUtilise l'outil pour lire les documents et effectuer ton analyse."
         ),
@@ -246,6 +315,7 @@ def run_module(module_name: str):
         task_key=cfg["alignment_task_key"],
         agent=alignment_agent,
         context=[formal_task, real_task],
+        additional_description=_wrap_few_shot(load_example(module_name, "alignment")),
     )
 
     crew = Crew(
@@ -374,7 +444,8 @@ def run_transversal_consolidation():
         task_key=cfg["task_key"],
         agent=transversal_agent,
         additional_description=(
-            "Notes de réalignement des modules :\n"
+            _wrap_few_shot(load_example("transversal", "transversal"))
+            + "\nNotes de réalignement des modules :\n"
             + consolidated_input
             + "\n\nUtilise l'outil 'Accès rapports de réalignement' pour relire "
             "un rapport spécifique si tu as besoin d'un approfondissement ciblé."
