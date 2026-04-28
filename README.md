@@ -107,7 +107,7 @@ Une bonne task précise :
 * les critères ;
 * les exclusions ;
 * le format de sortie.
-
+``` 
 # Apprentissage AI de type FEW-SHOT
 ### Après un run si l'on veux valider les analyses comme référence
 ```                                                                                              
