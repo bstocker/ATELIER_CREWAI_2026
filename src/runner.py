@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from crewai import Agent, Task, Crew, Process, LLM
 
 from loaders import load_directory_contents
+from tools import make_formal_tool, make_real_tool, make_reports_tool
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -66,6 +67,10 @@ TRANSVERSAL_CONFIG = {
     "task_key": "transversal_consolidation_task",
 }
 
+# Sections obligatoires dans un rapport de réalignement valide
+ALIGNMENT_REQUIRED_SECTIONS = ["désalignement", "quick win", "action structurante"]
+ALIGNMENT_MAX_RETRIES = 2
+
 
 load_dotenv()
 
@@ -114,7 +119,32 @@ def save_output(path: Path, content) -> None:
     path.write_text(text, encoding="utf-8")
 
 
-def make_agent(cfg: dict, key: str, llm: LLM) -> Agent:
+def _get_output_text(task_output) -> str:
+    if task_output is None:
+        return ""
+    if hasattr(task_output, "raw"):
+        return task_output.raw or ""
+    return str(task_output)
+
+
+def _check_alignment_quality(text: str) -> list[str]:
+    return [s for s in ALIGNMENT_REQUIRED_SECTIONS if s.lower() not in text.lower()]
+
+
+def _make_file_listing(directory: Path) -> str:
+    files = sorted(f.name for f in directory.rglob("*") if f.is_file())
+    if not files:
+        return "Aucun fichier disponible."
+    return "\n".join(f"  - {f}" for f in files)
+
+
+def make_agent(
+    cfg: dict,
+    key: str,
+    llm: LLM,
+    tools: list | None = None,
+    allow_delegation: bool = False,
+) -> Agent:
     if key not in cfg:
         raise KeyError(f"Agent '{key}' introuvable dans le YAML.")
 
@@ -123,8 +153,9 @@ def make_agent(cfg: dict, key: str, llm: LLM) -> Agent:
         goal=cfg[key]["goal"],
         backstory=cfg[key]["backstory"],
         llm=llm,
+        tools=tools or [],
         verbose=True,
-        allow_delegation=False,
+        allow_delegation=allow_delegation,
     )
 
 
@@ -166,28 +197,48 @@ def run_module(module_name: str):
     real_llm = build_llm("mini")
     alignment_llm = build_llm("strong")
 
-    formal_input = load_directory_contents(cfg["formal_dir"])
-    real_input = load_directory_contents(cfg["real_dir"])
-
     output_dir = cfg["output_dir"]
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    formal_agent = make_agent(agents_cfg, cfg["formal_agent_key"], formal_llm)
-    real_agent = make_agent(agents_cfg, cfg["real_agent_key"], real_llm)
-    alignment_agent = make_agent(agents_cfg, cfg["alignment_agent_key"], alignment_llm)
+    # Outils par agent (priorité 1 + 3)
+    formal_tool = make_formal_tool(cfg["formal_dir"])
+    real_tool = make_real_tool(cfg["real_dir"])
+
+    formal_agent = make_agent(
+        agents_cfg, cfg["formal_agent_key"], formal_llm,
+        tools=[formal_tool],
+    )
+    real_agent = make_agent(
+        agents_cfg, cfg["real_agent_key"], real_llm,
+        tools=[real_tool],
+    )
+    # Délégation activée pour l'agent de réalignement (priorité 3)
+    alignment_agent = make_agent(
+        agents_cfg, cfg["alignment_agent_key"], alignment_llm,
+        tools=[formal_tool, real_tool],
+        allow_delegation=True,
+    )
 
     formal_task = make_task(
         tasks_cfg=tasks_cfg,
         task_key=cfg["formal_task_key"],
         agent=formal_agent,
-        additional_description="Documents source :\n" + formal_input,
+        additional_description=(
+            "Documents formels disponibles via l'outil 'Accès documents formels' :\n"
+            + _make_file_listing(cfg["formal_dir"])
+            + "\n\nUtilise l'outil pour lire les documents et effectuer ton analyse."
+        ),
     )
 
     real_task = make_task(
         tasks_cfg=tasks_cfg,
         task_key=cfg["real_task_key"],
         agent=real_agent,
-        additional_description="Documents source :\n" + real_input,
+        additional_description=(
+            "Documents réels disponibles via l'outil 'Accès documents réels' :\n"
+            + _make_file_listing(cfg["real_dir"])
+            + "\n\nUtilise l'outil pour lire les documents et effectuer ton analyse."
+        ),
     )
 
     alignment_task = make_task(
@@ -204,19 +255,61 @@ def run_module(module_name: str):
         verbose=True,
     )
 
-    result = crew.kickoff()
+    crew.kickoff()
+
+    # Quality Gate (priorité 4) — relance alignment si sections manquantes
+    alignment_output_text = _get_output_text(getattr(alignment_task, "output", None))
+    missing = _check_alignment_quality(alignment_output_text)
+
+    for attempt in range(ALIGNMENT_MAX_RETRIES):
+        if not missing:
+            break
+
+        print(f"\n[QUALITY GATE] Tentative {attempt + 1}/{ALIGNMENT_MAX_RETRIES} — sections manquantes : {missing}")
+
+        formal_raw = _get_output_text(getattr(formal_task, "output", None))
+        real_raw = _get_output_text(getattr(real_task, "output", None))
+
+        retry_task = make_task(
+            tasks_cfg=tasks_cfg,
+            task_key=cfg["alignment_task_key"],
+            agent=alignment_agent,
+            additional_description=(
+                f"[RELANCE QUALITÉ — tentative {attempt + 2}]\n"
+                f"Ta réponse précédente est incomplète. Sections obligatoires manquantes : "
+                f"{', '.join(missing)}.\n"
+                f"Couvre IMPÉRATIVEMENT ces sections dans ta réponse.\n\n"
+                f"=== ANALYSE FORMELLE ===\n{formal_raw}\n\n"
+                f"=== ANALYSE RÉELLE ===\n{real_raw}"
+            ),
+        )
+
+        retry_crew = Crew(
+            agents=[alignment_agent],
+            tasks=[retry_task],
+            process=Process.sequential,
+            verbose=True,
+        )
+        retry_crew.kickoff()
+
+        alignment_task = retry_task
+        alignment_output_text = _get_output_text(getattr(retry_task, "output", None))
+        missing = _check_alignment_quality(alignment_output_text)
+
+    if missing:
+        print(f"\n[QUALITY GATE] Max retries atteint. Sections toujours manquantes : {missing}")
 
     save_output(output_dir / "analyse_formelle.md", getattr(formal_task, "output", ""))
     save_output(output_dir / "analyse_reelle.md", getattr(real_task, "output", ""))
     save_output(
         output_dir / "rapport_realignement.md",
-        getattr(alignment_task, "output", result),
+        getattr(alignment_task, "output", ""),
     )
 
     print(f"\n=== Exécution {module_name} terminée ===")
     print(f"Fichiers générés dans : {output_dir}")
 
-    return result
+    return getattr(alignment_task, "output", "")
 
 
 def collect_alignment_reports() -> str:
@@ -255,6 +348,7 @@ def run_transversal_consolidation():
     tasks_cfg = load_yaml(cfg["tasks_file"])
 
     transversal_llm = build_llm("strong")
+    manager_llm = build_llm("strong")
 
     output_dir = cfg["output_dir"]
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -264,23 +358,35 @@ def run_transversal_consolidation():
     if not consolidated_input.strip():
         raise ValueError("Aucun rapport disponible pour consolidation.")
 
+    # Outil pour re-lire des rapports spécifiques à la demande (priorité 1 + 2)
+    reports_tool = make_reports_tool(BASE_DIR / "modules")
+
     transversal_agent = make_agent(
         agents_cfg,
         cfg["agent_key"],
         transversal_llm,
+        tools=[reports_tool],
+        allow_delegation=True,
     )
 
     transversal_task = make_task(
         tasks_cfg=tasks_cfg,
         task_key=cfg["task_key"],
         agent=transversal_agent,
-        additional_description="Notes de réalignement des modules :\n" + consolidated_input,
+        additional_description=(
+            "Notes de réalignement des modules :\n"
+            + consolidated_input
+            + "\n\nUtilise l'outil 'Accès rapports de réalignement' pour relire "
+            "un rapport spécifique si tu as besoin d'un approfondissement ciblé."
+        ),
     )
 
+    # Processus hiérarchique : manager orchestre la consolidation (priorité 2)
     crew = Crew(
         agents=[transversal_agent],
         tasks=[transversal_task],
-        process=Process.sequential,
+        process=Process.hierarchical,
+        manager_llm=manager_llm,
         verbose=True,
     )
 
