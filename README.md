@@ -107,3 +107,13 @@ Une bonne task précise :
 * les critères ;
 * les exclusions ;
 * le format de sortie.
+
+# Apprentissage AI de type FEW-SHOT
+### Après un run si l'on veux valider les analyses comme référence
+```                                                                                              
+  python main.py --validate admission pharmacie bloc transversal                                                                            
+```                                                                                                                                          
+  ### Run suivant — les exemples sont injectés automatiquement comme rapports de références
+  ```                                                                                
+  python main.py --all --transversal
+  ```
