@@ -1,3 +1,49 @@
+# Environnement de DEV
+### Modification du fichier .env
+```
+ANTHROPIC_API_KEY=sk-ant-...   # obligatoire
+
+DEVELOPPEMENT :
+CLAUDE_MODEL_MINI=claude-haiku-4-5
+CLAUDE_MODEL_STRONG=claude-haiku-4-5
+```
+### Installation Claude + Caveman
+```
+curl -fsSL https://claude.ai/install.sh | bash
+claude plugin marketplace add JuliusBrussee/caveman
+claude plugin install caveman@caveman
+```
+### Lancement de Claude
+```
+claude
+```
+
+# Environnement de TESTS
+### Modification du fichier .env
+```
+ANTHROPIC_API_KEY=sk-ant-...   # obligatoire
+
+CLAUDE_MODEL_MINI=claude-haiku-4-5
+CLAUDE_MODEL_STRONG=claude-sonnet-4-6
+```
+### Installation Claude
+```
+curl -fsSL https://claude.ai/install.sh | bash
+```
+### Lancement de Claude
+```
+claude
+```
+
+# Environement de PROD
+```
+ANTHROPIC_API_KEY=sk-ant-...   # obligatoire
+
+CLAUDE_MODEL_MINI=claude-sonnet-4-6
+CLAUDE_MODEL_STRONG=claude-opus-4-6
+```
+
+
 # Prérequis
 ```
 sudo apt-get update
@@ -17,17 +63,7 @@ python src/main.py --all
 python src/main.py --all --transversal
 ou lance uniquement la consolidation à partir des rapports déjà existants :
 python src/main.py --transversal
-```
-# Variables
-```
-DEVELOPPEMENT :
-OPENAI_MODEL_MINI=gpt-4o-mini
-OPENAI_MODEL_STRONG=gpt-4o-mini
-
-PRODUCTION
-OPENAI_MODEL_MINI=gpt-4o-mini
-OPENAI_MODEL_STRONG=gpt-4o
-```
+```1
 # Le répertoire formal du module concerné doit contenir :
 * procédures
 * modes opératoires

@@ -84,27 +84,34 @@ def load_yaml(path: Path) -> dict:
 
 
 def build_llm(profile: str = "mini") -> LLM:
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = os.getenv("ANTHROPIC_API_KEY")
 
     if not api_key:
-        raise ValueError("OPENAI_API_KEY introuvable. Renseigne-le dans .env ou secrets.")
+        raise ValueError("ANTHROPIC_API_KEY introuvable. Renseigne-le dans .env ou secrets.")
 
     if profile == "strong":
-        model = os.getenv("OPENAI_MODEL_STRONG", "gpt-4o")
+        model = os.getenv("CLAUDE_MODEL_STRONG", "claude-sonnet-4-6")
     else:
-        model = os.getenv("OPENAI_MODEL_MINI", "gpt-4o-mini")
+        model = os.getenv("CLAUDE_MODEL_MINI", "claude-haiku-4-5")
 
     print(f"[LLM] Profil={profile} | Modèle={model}")
 
     return LLM(
-        model=model,
+        model=f"anthropic/{model}",
         api_key=api_key,
+        max_tokens=32000,
     )
 
 
 def save_output(path: Path, content) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("" if content is None else str(content), encoding="utf-8")
+    if content is None:
+        text = ""
+    elif hasattr(content, "raw"):
+        text = content.raw or ""
+    else:
+        text = str(content)
+    path.write_text(text, encoding="utf-8")
 
 
 def make_agent(cfg: dict, key: str, llm: LLM) -> Agent:
