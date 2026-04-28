@@ -1,34 +1,220 @@
 formal_pharmacy_task:
   description: >
-    Analyse les documents du processus formel pharmacie.
-    Identifie les étapes officielles, les sous-processus, les acteurs impliqués,
-    les règles, les validations, les dépendances et les points de vigilance.
-    Ne parle pas des usages réels.
+    Analyse les documents du processus formel pharmacie hospitalière fournis.
+    Ta mission est de reconstruire fidèlement le fonctionnement officiel prescrit,
+    tel qu'il est décrit dans les procédures, modes opératoires, règles de gestion,
+    droits d'accès et cartographies de processus.
+
+    Tu dois couvrir les points suivants :
+    1. Identifier les sous-processus du circuit pharmacie : approvisionnement,
+       réception, stockage, commande interne, dispensation, inventaire, droits d'accès.
+    2. Pour chaque sous-processus, identifier : les acteurs responsables
+       (pharmaciens, préparateurs, soignants), les actions attendues, les règles de
+       gestion applicables, les validations requises et les outils SIH utilisés.
+    3. Identifier les obligations réglementaires explicitement mentionnées :
+       traçabilité des stupéfiants, gestion des périmés, bonnes pratiques de pharmacie
+       hospitalière (BPPH), traçabilité des dispositifs médicaux.
+    4. Identifier les dépendances critiques : quelles étapes doivent précéder d'autres,
+       quelles validations conditionnent la dispensation ou le mouvement de stock.
+    5. Identifier les interfaces avec d'autres services : services cliniques,
+       stérilisation, logistique, fournisseurs, organismes de contrôle.
+    6. Relever les points de vigilance explicitement mentionnés dans les documents.
+    7. Signaler les zones d'ombre ou incohérences dans le formel, sans les corriger.
+
+    Tu ne parles pas des usages réels. Tu ne proposes pas de recommandations.
+    Tu restes strictement dans le périmètre des documents fournis.
+
   expected_output: >
-    Une fiche structurée du processus formel pharmacie :
-    finalité, sous-processus, étapes formelles, acteurs impliqués,
-    règles et validations, dépendances critiques, points de vigilance.
+    Une fiche structurée du processus formel pharmacie hospitalière en Markdown,
+    comprenant les sections suivantes :
+
+    ## Fiche du processus formel — Circuit Pharmacie Hospitalière
+
+    ### 1. Présentation générale
+    Résumer l'objectif du circuit pharmacie, son périmètre, les principaux acteurs
+    impliqués et les systèmes SIH concernés.
+
+    ### 2. Sous-processus et étapes formelles
+    Pour chaque sous-processus (approvisionnement, réception, stockage, commande
+    interne, dispensation, inventaire, droits d'accès), décrire les étapes sous
+    forme de tableau avec les colonnes :
+    - N° étape
+    - Intitulé de l'étape
+    - Acteur responsable
+    - Action prescrite
+    - Outil / écran SIH
+    - Règle ou validation requise
+
+    ### 3. Obligations réglementaires
+    Lister les exigences réglementaires applicables identifiées dans les documents :
+    stupéfiants, périmés, BPPH, traçabilité DMI, conditions de stockage, etc.
+
+    ### 4. Dépendances critiques
+    Lister les dépendances séquentielles obligatoires entre étapes ou entre
+    sous-processus. Indiquer les données ou validations qui bloquent la suite
+    du circuit si absentes.
+
+    ### 5. Interfaces avec d'autres services
+    Décrire les interfaces avec les services cliniques, la stérilisation,
+    la logistique et les fournisseurs externes.
+
+    ### 6. Points de vigilance formels
+    Lister les risques, contraintes réglementaires, délais imposés et points
+    d'attention explicitement mentionnés dans les documents formels.
+
+    ### 7. Zones d'ombre et incohérences du formel
+    Signaler les points du processus formel qui sont mal documentés, contradictoires
+    ou insuffisamment précis pour être appliqués sans interprétation.
+
 
 real_pharmacy_task:
   description: >
-    Analyse les documents des usages réels pharmacie.
-    Décris comment le processus se déroule réellement,
-    identifie les contournements, ajustements, irritants,
-    contraintes terrain et effets observés.
-    Ne propose pas encore de solution.
+    Analyse les documents des usages réels du circuit pharmacie hospitalière fournis.
+    Ta mission est de décrire fidèlement comment le processus se déroule réellement
+    sur le terrain, tel que révélé par les traces opérationnelles disponibles.
+
+    Tu dois couvrir les points suivants :
+    1. Décrire le déroulement réel de chaque sous-processus (approvisionnement,
+       dispensation, gestion des stocks, inventaire), y compris les variations
+       selon les contextes (urgences, ruptures de stock, nuit, week-end).
+    2. Identifier les acteurs réellement mobilisés et leur rôle effectif,
+       qui peut différer du rôle prescrit.
+    3. Identifier les contournements : quelles étapes sont ignorées, simplifiées
+       ou remplacées par une pratique alternative, et pourquoi.
+    4. Identifier les doubles saisies, ressaisies manuelles et traitements hors système.
+    5. Identifier les tensions entre rapidité de dispensation et rigueur des contrôles,
+       notamment en situation d'urgence ou de flux tendu.
+    6. Identifier les écarts de traçabilité : médicaments distribués sans enregistrement,
+       stupéfiants mal tracés, DMI non scannés.
+    7. Identifier les irritants opérationnels vécus par les équipes pharmaceutiques
+       et soignantes.
+    8. Décrire les effets observés sur la sécurité patient, la traçabilité,
+       la gestion des stocks et la conformité réglementaire.
+
+    Tu ne compares pas encore avec le formel. Tu ne proposes pas de solutions.
+    Tu décris les faits sans jugement sur les équipes.
+
   expected_output: >
-    Une fiche structurée des pratiques réelles pharmacie :
-    déroulement réel, acteurs réellement mobilisés, contournements,
-    contraintes opérationnelles, irritants, effets observés.
+    Une fiche structurée des pratiques réelles pharmacie hospitalière en Markdown,
+    comprenant les sections suivantes :
+
+    ## Fiche des pratiques réelles — Circuit Pharmacie Hospitalière
+
+    ### 1. Déroulement réel du circuit
+    Décrire le flux réel observé pour chaque sous-processus, en signalant
+    les variations selon les contextes (urgence, rupture, nuit, week-end).
+
+    ### 2. Acteurs réellement mobilisés
+    Décrire qui fait quoi réellement, en signalant les écarts de rôle
+    par rapport au prescrit (tâches déléguées, cumuls de rôles, suppléances).
+
+    ### 3. Contournements identifiés
+    Présenter sous forme de tableau avec les colonnes :
+    - Contournement observé
+    - Sous-processus concerné
+    - Raison probable
+    - Fréquence estimée
+    - Impact sur la sécurité ou la traçabilité
+
+    ### 4. Doubles saisies et traitements hors système
+    Lister les opérations effectuées manuellement ou en dehors du SIH pharmacie.
+    Décrire les supports utilisés (Excel, papier, cahier de traçabilité, etc.).
+
+    ### 5. Tensions urgence / rigueur
+    Décrire les situations où la pression de temps ou d'urgence conduit à
+    simplifier ou contourner les contrôles prescrits, et leurs conséquences.
+
+    ### 6. Écarts de traçabilité
+    Lister les situations où la traçabilité prescrite n'est pas assurée :
+    stupéfiants, DMI, médicaments à risque, sorties de stock non enregistrées.
+
+    ### 7. Irritants opérationnels
+    Lister les points de friction vécus par les équipes pharmaceutiques et soignantes,
+    avec leur fréquence et leur impact.
+
+    ### 8. Effets observés
+    Décrire les conséquences constatées sur : sécurité patient, traçabilité réglementaire,
+    gestion des stocks, conformité aux BPPH, charge de travail des équipes.
+
 
 alignment_pharmacy_task:
   description: >
-    Compare l'analyse formelle et l'analyse réelle du circuit pharmacie.
-    Identifie les désalignements socio-techniques, qualifie leur nature,
-    formule des hypothèses explicatives, évalue les impacts opérationnels
-    et propose des quick wins ainsi que des actions structurantes.
+    Tu disposes de l'analyse formelle et de l'analyse réelle du circuit pharmacie
+    hospitalière. Ta mission est de produire une note de réalignement socio-technique
+    qui identifie les désalignements, en analyse les causes et propose des actions
+    concrètes, en plaçant la sécurité patient comme contrainte prioritaire.
+
+    Tu dois couvrir les points suivants :
+    1. Mettre en regard le formel et le réel pour identifier les écarts significatifs.
+       Distinguer les désalignements selon leur nature : sécurité patient, conformité
+       réglementaire, efficience opérationnelle, qualité des données.
+    2. Pour chaque désalignement majeur, formuler une hypothèse explicative en croisant
+       les dimensions organisationnelle, fonctionnelle, technique et humaine.
+    3. Évaluer le niveau de risque : risque patient (erreur médicamenteuse, rupture
+       de traçabilité), risque réglementaire (non-conformité BPPH, stupéfiants),
+       risque opérationnel (rupture de stock, surcharge, inefficience).
+    4. Proposer des quick wins : actions correctives réalisables sous 3 mois.
+       Prioriser absolument les actions qui réduisent un risque patient ou réglementaire.
+    5. Proposer des actions structurantes : changements de processus, paramétrages,
+       formations, interfaces, nécessitant 3 à 18 mois.
+    6. Identifier les points de vigilance de gouvernance impliquant des arbitrages
+       entre la pharmacie, les services cliniques, la DSI et la Direction.
+
+    Ta posture : la sécurité patient prime sur toute autre considération. Tu distingues
+    clairement les désalignements critiques des désalignements d'efficience.
+    Tu construis des recommandations réalistes et acceptables par les équipes.
+
   expected_output: >
-    Une note de réalignement pharmacie contenant :
-    synthèse du désalignement, écarts majeurs identifiés,
-    causes probables, impacts opérationnels, quick wins,
-    actions structurantes, point de vigilance de gouvernance.
+    Une note de réalignement socio-technique pharmacie hospitalière en Markdown,
+    comprenant les sections suivantes :
+
+    ## Note de réalignement — Circuit Pharmacie Hospitalière
+
+    ### 1. Synthèse du désalignement
+    Résumer en quelques paragraphes l'écart global entre le processus formel
+    et les pratiques réelles. Qualifier le niveau de désalignement global
+    (faible / modéré / fort / critique) et ses principales conséquences sur
+    la sécurité patient, la traçabilité et l'efficience.
+
+    ### 2. Écarts majeurs identifiés
+    Présenter sous forme de tableau avec les colonnes :
+    - Désalignement constaté
+    - Sous-processus concerné
+    - Nature de l'écart (sécurité / réglementaire / fonctionnel / technique / humain)
+    - Cause probable
+    - Impact opérationnel
+    - Niveau de risque (faible / modéré / fort / critique)
+
+    ### 3. Analyse des causes probables
+    Développer les causes racines pour les désalignements les plus critiques.
+    Croiser les dimensions : organisationnelle, fonctionnelle, technique, humaine,
+    formation, paramétrage, gouvernance, pression opérationnelle.
+
+    ### 4. Impacts consolidés par dimension de risque
+    Structurer les impacts selon trois niveaux :
+    - Risques sécurité patient : erreurs médicamenteuses, ruptures de traçabilité
+    - Risques réglementaires : non-conformités BPPH, traçabilité stupéfiants, DMI
+    - Risques opérationnels : ruptures de stock, surcharge, inefficience
+
+    ### 5. Quick wins recommandés
+    Présenter sous forme de tableau avec les colonnes :
+    - Action recommandée
+    - Désalignement ciblé
+    - Risque réduit
+    - Responsable pressenti
+    - Délai indicatif (< 3 mois)
+    - Difficulté estimée
+
+    ### 6. Actions structurantes recommandées
+    Présenter sous forme de tableau avec les colonnes :
+    - Action recommandée
+    - Désalignement ciblé
+    - Risque réduit
+    - Responsable pressenti
+    - Horizon (3-6 mois / 6-12 mois / 12-18 mois)
+    - Prérequis ou dépendances
+
+    ### 7. Points de vigilance de gouvernance
+    Lister les sujets nécessitant un arbitrage entre la pharmacie, les services
+    cliniques, la DSI et la Direction. Identifier les sujets à inscrire en priorité
+    à l'agenda du COPIL SIH ou du COMEDIMS.

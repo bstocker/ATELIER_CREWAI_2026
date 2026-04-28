@@ -1,32 +1,210 @@
 formal_task:
   description: >
-    Analyse les documents du processus formel admission-facturation.
-    Identifie les étapes officielles, les acteurs impliqués, les règles, les validations,
-    les dépendances et les points de vigilance. Ne parle pas des usages réels.
+    Analyse les documents du processus formel admission-facturation fournis.
+    Ta mission est de reconstruire fidèlement le fonctionnement officiel prescrit,
+    tel qu'il est décrit dans les procédures, modes opératoires, règles de gestion
+    et cartographies de processus.
+
+    Tu dois couvrir les points suivants :
+    1. Identifier les grandes étapes du circuit, de l'arrivée du patient à la
+       génération de la facture, dans leur ordre chronologique prescrit.
+    2. Pour chaque étape, identifier : les acteurs responsables, les actions attendues,
+       les règles de gestion applicables, les validations requises et les outils SIH utilisés.
+    3. Identifier les dépendances critiques : quelles étapes doivent obligatoirement
+       précéder d'autres, quelles données doivent être présentes pour débloquer la suite.
+    4. Identifier les interfaces avec d'autres modules ou services : DIM, facturation,
+       tiers payant, organismes payeurs (AMO/AMC), urgences, consultations.
+    5. Relever les points de vigilance explicitement mentionnés dans les documents :
+       risques d'erreur, obligations réglementaires, délais imposés.
+    6. Signaler les zones d'ombre ou incohérences dans le formel, sans les corriger.
+
+    Tu ne parles pas des usages réels. Tu ne proposes pas de recommandations.
+    Tu restes strictement dans le périmètre des documents fournis.
+
   expected_output: >
-    Une fiche structurée du processus formel :
-    titre, objectif, étapes formelles, acteurs impliqués, règles et validations,
-    dépendances critiques, points de vigilance.
+    Une fiche structurée du processus formel admission-facturation en Markdown,
+    comprenant les sections suivantes :
+
+    ## Fiche du processus formel — Admission-Facturation
+
+    ### 1. Présentation générale
+    Résumer l'objectif du circuit, son périmètre, les principaux acteurs impliqués
+    et les systèmes SIH concernés.
+
+    ### 2. Étapes formelles du circuit
+    Décrire chaque étape sous forme de tableau avec les colonnes :
+    - N° étape
+    - Intitulé de l'étape
+    - Acteur responsable
+    - Action prescrite
+    - Outil / écran SIH
+    - Règle ou validation requise
+
+    ### 3. Dépendances critiques
+    Lister les dépendances séquentielles obligatoires entre étapes.
+    Indiquer les données ou validations qui bloquent la suite du circuit si absentes.
+
+    ### 4. Interfaces avec d'autres modules ou services
+    Lister les points d'interface avec d'autres circuits (DIM, facturation, tiers payant,
+    urgences, consultations, organismes payeurs) et décrire ce qui est attendu à chaque interface.
+
+    ### 5. Règles et validations clés
+    Synthétiser les principales règles de gestion et obligations de validation
+    identifiées dans les documents.
+
+    ### 6. Points de vigilance formels
+    Lister les risques, contraintes réglementaires, délais imposés et points d'attention
+    explicitement mentionnés dans les documents formels.
+
+    ### 7. Zones d'ombre et incohérences du formel
+    Signaler les points du processus formel qui sont mal documentés, contradictoires
+    ou insuffisamment précis pour être appliqués sans interprétation.
+
 
 real_task:
   description: >
-    Analyse les documents des usages réels admission-facturation.
-    Décris comment le processus se déroule réellement, les contournements,
-    les ajustements, les irritants, les contraintes terrain et les effets observés.
-    Ne propose pas encore de solution.
+    Analyse les documents des usages réels du circuit admission-facturation fournis.
+    Ta mission est de décrire fidèlement comment le processus se déroule réellement
+    sur le terrain, tel que révélé par les traces opérationnelles disponibles
+    (formulaires remplis, extractions Excel, mails, incidents, notes terrain, etc.).
+
+    Tu dois couvrir les points suivants :
+    1. Décrire le déroulement réel du circuit, étape par étape, tel qu'il se produit
+       effectivement, y compris les variations selon les situations (urgences, patients
+       sans droits, flux tendus, absences).
+    2. Identifier les acteurs réellement mobilisés et leur rôle effectif,
+       qui peut différer du rôle prescrit.
+    3. Identifier les contournements : quelles étapes sont ignorées, simplifiées
+       ou remplacées par une pratique alternative, et pourquoi.
+    4. Identifier les doubles saisies, ressaisies manuelles et traitements hors système.
+    5. Identifier les coordinations informelles entre services ou agents.
+    6. Identifier les irritants opérationnels : ce qui ralentit, frustre, génère
+       des erreurs ou épuise les agents.
+    7. Identifier les cas non couverts par le formel et comment les équipes les gèrent.
+    8. Décrire les effets observés : délais, erreurs, pertes de données, rejets,
+       surcharge, dégradation de la qualité du dossier patient.
+
+    Tu ne compares pas encore avec le formel. Tu ne proposes pas de solutions.
+    Tu décris les faits sans jugement sur les équipes.
+
   expected_output: >
-    Une fiche structurée des pratiques réelles :
-    déroulement réel, acteurs réellement mobilisés, contournements,
-    irritants opérationnels, contraintes terrain, effets observés.
+    Une fiche structurée des pratiques réelles admission-facturation en Markdown,
+    comprenant les sections suivantes :
+
+    ## Fiche des pratiques réelles — Admission-Facturation
+
+    ### 1. Déroulement réel du circuit
+    Décrire le flux réel observé, étape par étape, en signalant les variations
+    selon les contextes (urgence, patient sans droits, flux tendu, période de nuit, etc.).
+
+    ### 2. Acteurs réellement mobilisés
+    Décrire qui fait quoi réellement, en signalant les écarts de rôle
+    par rapport à ce qui est prescrit.
+
+    ### 3. Contournements identifiés
+    Présenter sous forme de tableau avec les colonnes :
+    - Contournement observé
+    - Étape concernée
+    - Raison probable
+    - Fréquence estimée
+    - Impact observé
+
+    ### 4. Doubles saisies et traitements hors système
+    Lister les opérations effectuées manuellement ou en dehors du SIH.
+    Décrire les supports utilisés (Excel, papier, mail, etc.).
+
+    ### 5. Coordinations informelles
+    Décrire les modes de coordination non prescrits entre agents ou services
+    (appels téléphoniques, messages WhatsApp, passages physiques, etc.).
+
+    ### 6. Irritants opérationnels
+    Lister les points de friction vécus par les équipes, avec leur fréquence
+    et leur impact sur la qualité de travail ou la prise en charge.
+
+    ### 7. Cas non couverts par le formel
+    Décrire les situations que le processus formel ne prévoit pas
+    et comment les équipes les gèrent en pratique.
+
+    ### 8. Effets observés
+    Décrire les conséquences constatées : délais de facturation, taux de rejet,
+    erreurs d'identité, dossiers incomplets, surcharge administrative, etc.
+
 
 alignment_task:
   description: >
-    Compare l'analyse formelle et l'analyse réelle du circuit admission-facturation.
-    Identifie les désalignements socio-techniques, qualifie leur nature,
-    formule des hypothèses explicatives, évalue les impacts opérationnels
-    et propose des quick wins ainsi que des actions structurantes.
+    Tu disposes de l'analyse formelle et de l'analyse réelle du circuit admission-facturation.
+    Ta mission est de produire une note de réalignement socio-technique qui identifie
+    les désalignements, en analyse les causes et propose des actions concrètes.
+
+    Tu dois couvrir les points suivants :
+    1. Mettre en regard le formel et le réel pour identifier les écarts significatifs.
+       Distinguer les écarts mineurs (variations sans conséquence) des désalignements
+       majeurs (écarts qui génèrent des risques, des pertes, des surcharges ou des
+       dégradations de la qualité de service).
+    2. Pour chaque désalignement majeur, formuler une hypothèse explicative en croisant
+       les dimensions organisationnelle, fonctionnelle, technique et humaine.
+    3. Évaluer les impacts opérationnels : qualité du dossier patient, délais de facturation,
+       taux de rejet, charge de travail, risques réglementaires, sécurité des données.
+    4. Proposer des quick wins : actions correctives réalisables sous 3 mois, sans
+       investissement technique majeur, par simple clarification, paramétrage ou formation.
+    5. Proposer des actions structurantes : changements de processus, paramétrages,
+       formations, interfaces à développer, nécessitant 3 à 18 mois.
+    6. Identifier les points de vigilance de gouvernance qui dépassent le seul périmètre
+       technique et impliquent des arbitrages managériaux ou organisationnels.
+
+    Ta posture : tu ne blâmes pas les acteurs terrain. Tu construis des recommandations
+    réalistes, priorisées et acceptables par les équipes comme par la direction.
+
   expected_output: >
-    Une note de réalignement contenant :
-    synthèse du désalignement, écarts majeurs identifiés, causes probables,
-    impacts opérationnels, quick wins, actions structurantes,
-    point de vigilance de gouvernance.
+    Une note de réalignement socio-technique admission-facturation en Markdown,
+    comprenant les sections suivantes :
+
+    ## Note de réalignement — Circuit Admission-Facturation
+
+    ### 1. Synthèse du désalignement
+    Résumer en quelques paragraphes l'écart global entre le processus formel
+    et les pratiques réelles. Qualifier le niveau de désalignement global
+    (faible / modéré / fort / critique) et ses principales conséquences.
+
+    ### 2. Écarts majeurs identifiés
+    Présenter sous forme de tableau avec les colonnes :
+    - Désalignement constaté
+    - Étape concernée
+    - Nature de l'écart (organisationnel / fonctionnel / technique / humain)
+    - Cause probable
+    - Impact opérationnel
+    - Niveau de criticité (faible / modéré / fort / critique)
+
+    ### 3. Analyse des causes probables
+    Développer les causes racines pour les désalignements les plus critiques.
+    Croiser les dimensions : organisationnelle, fonctionnelle, technique, humaine,
+    formation, paramétrage, gouvernance.
+
+    ### 4. Impacts opérationnels consolidés
+    Décrire les conséquences concrètes sur : délais de facturation, taux de rejet,
+    qualité du dossier, charge de travail, risques réglementaires, sécurité des données,
+    coordination interservices.
+
+    ### 5. Quick wins recommandés
+    Présenter sous forme de tableau avec les colonnes :
+    - Action recommandée
+    - Désalignement ciblé
+    - Effet attendu
+    - Responsable pressenti
+    - Délai indicatif (< 3 mois)
+    - Difficulté estimée
+
+    ### 6. Actions structurantes recommandées
+    Présenter sous forme de tableau avec les colonnes :
+    - Action recommandée
+    - Désalignement ciblé
+    - Effet attendu
+    - Responsable pressenti
+    - Horizon (3-6 mois / 6-12 mois / 12-18 mois)
+    - Prérequis ou dépendances
+
+    ### 7. Points de vigilance de gouvernance
+    Lister les sujets nécessitant un arbitrage ou une attention particulière
+    de la Direction, de la DSI ou des responsables métiers. Expliquer pourquoi
+    ces points dépassent le seul cadre technique et impliquent des décisions
+    organisationnelles ou managériales.

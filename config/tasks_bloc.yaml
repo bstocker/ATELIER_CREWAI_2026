@@ -1,39 +1,224 @@
 formal_task:
   description: >
-    Analyse les documents du processus formel bloc opératoire.
-    Identifie les étapes officielles du parcours patient,
-    les acteurs impliqués, les règles, les validations,
-    les dépendances critiques et les points de vigilance.
-    Ne parle pas des usages réels.
+    Analyse les documents du processus formel bloc opératoire fournis.
+    Ta mission est de reconstruire fidèlement le fonctionnement officiel prescrit,
+    tel qu'il est décrit dans les procédures, modes opératoires, check-lists,
+    règles de gestion et cartographies de processus.
+
+    Tu dois couvrir les points suivants :
+    1. Identifier les grandes étapes du parcours patient au bloc, de la préadmission
+       à la sortie post-interventionnelle, dans leur ordre chronologique prescrit.
+    2. Pour chaque étape, identifier : les acteurs responsables (chirurgien, anesthésiste,
+       IBODE, IADE, cadre de bloc, brancardier), les actions attendues, les règles de
+       gestion applicables, les validations requises et les outils SIH utilisés.
+    3. Identifier les obligations réglementaires explicitement mentionnées :
+       check-list HAS (sécurité du patient au bloc), traçabilité des dispositifs médicaux
+       implantables (DMI), gestion des stupéfiants, codage CCAM des actes opératoires.
+    4. Identifier les dépendances critiques : quelles étapes doivent obligatoirement
+       précéder d'autres, quelles validations conditionnent l'entrée en salle ou la clôture.
+    5. Identifier les interfaces avec d'autres services : réanimation, stérilisation,
+       brancardage, DIM, pharmacie, services d'hospitalisation, imagerie peropératoire.
+    6. Relever les points de vigilance explicitement mentionnés dans les documents.
+    7. Signaler les zones d'ombre ou incohérences dans le formel, sans les corriger.
+
+    Tu ne parles pas des usages réels. Tu ne proposes pas de recommandations.
+    Tu restes strictement dans le périmètre des documents fournis.
+
   expected_output: >
-    Une fiche structurée du processus formel :
-    titre, objectif, étapes formelles, acteurs impliqués,
-    règles et validations, dépendances critiques,
-    points de vigilance.
+    Une fiche structurée du processus formel bloc opératoire en Markdown,
+    comprenant les sections suivantes :
+
+    ## Fiche du processus formel — Bloc Opératoire
+
+    ### 1. Présentation générale
+    Résumer l'objectif du circuit bloc, son périmètre (de la préadmission à la sortie),
+    les principaux acteurs impliqués et les systèmes SIH concernés.
+
+    ### 2. Étapes formelles du parcours patient
+    Décrire chaque étape sous forme de tableau avec les colonnes :
+    - N° étape
+    - Phase (préadmission / préopératoire / peropératoire / postopératoire / sortie)
+    - Intitulé de l'étape
+    - Acteur responsable
+    - Action prescrite
+    - Outil / écran SIH
+    - Règle ou validation requise
+
+    ### 3. Obligations réglementaires
+    Lister les exigences réglementaires applicables identifiées dans les documents :
+    check-list HAS, traçabilité DMI, gestion stupéfiants bloc, codage CCAM,
+    compte rendu opératoire, consentement éclairé, etc.
+
+    ### 4. Dépendances critiques
+    Lister les dépendances séquentielles obligatoires entre étapes.
+    Indiquer les validations ou données qui bloquent l'entrée en salle,
+    le démarrage de l'anesthésie ou la clôture du dossier si absentes.
+
+    ### 5. Interfaces avec d'autres services
+    Décrire les interfaces avec : réanimation, stérilisation, brancardage,
+    DIM, pharmacie, services d'hospitalisation, imagerie peropératoire.
+    Préciser ce qui est attendu à chaque interface et qui en est responsable.
+
+    ### 6. Points de vigilance formels
+    Lister les risques, contraintes réglementaires, délais imposés et points
+    d'attention explicitement mentionnés dans les documents formels.
+
+    ### 7. Zones d'ombre et incohérences du formel
+    Signaler les points du processus formel qui sont mal documentés, contradictoires
+    ou insuffisamment précis pour être appliqués sans interprétation.
+
 
 real_task:
   description: >
-    Analyse les documents des usages réels bloc opératoire.
-    Décris comment le processus se déroule réellement,
-    les contournements, les ajustements, les irritants,
-    les contraintes terrain et les effets observés.
-    Ne propose pas encore de solution.
+    Analyse les documents des usages réels du bloc opératoire fournis.
+    Ta mission est de décrire fidèlement comment le parcours se déroule réellement
+    sur le terrain, tel que révélé par les traces opérationnelles disponibles
+    (notes terrain, incidents, comptes rendus, mails, formulaires partiels, etc.).
+
+    Tu dois couvrir les points suivants :
+    1. Décrire le déroulement réel du parcours patient, phase par phase, y compris
+       les variations selon les contextes (urgences intercurrentes, déprogrammations,
+       retards de programme, absences, pannes matérielles).
+    2. Identifier les acteurs réellement mobilisés et leur rôle effectif,
+       qui peut différer du rôle prescrit (cumuls de rôles, suppléances, délégations).
+    3. Identifier les contournements : quelles étapes sont ignorées, simplifiées
+       ou remplacées par une pratique alternative, et pourquoi.
+    4. Identifier les doubles saisies, ressaisies manuelles et traitements hors système
+       (check-lists papier, cahiers de bloc, Excel de planning, etc.).
+    5. Identifier les coordinations informelles entre services (appels directs,
+       présence physique, messagerie non sécurisée) qui remplacent les interfaces SIH.
+    6. Identifier les tensions entre efficience du programme opératoire et rigueur
+       des contrôles prescrits (check-list, traçabilité DMI, codage CCAM).
+    7. Identifier les irritants opérationnels vécus par les équipes du bloc.
+    8. Décrire les effets observés sur la sécurité patient, la traçabilité,
+       le programme opératoire et la valorisation des actes.
+
+    Tu ne compares pas encore avec le formel. Tu ne proposes pas de solutions.
+    Tu décris les faits sans jugement sur les équipes.
+
   expected_output: >
-    Une fiche structurée des pratiques réelles :
-    déroulement réel, acteurs réellement mobilisés,
-    contournements, irritants opérationnels,
-    contraintes terrain, effets observés.
+    Une fiche structurée des pratiques réelles bloc opératoire en Markdown,
+    comprenant les sections suivantes :
+
+    ## Fiche des pratiques réelles — Bloc Opératoire
+
+    ### 1. Déroulement réel du parcours patient
+    Décrire le flux réel observé, phase par phase, en signalant les variations
+    selon les contextes (urgence, déprogrammation, retard, panne, absence de personnel).
+
+    ### 2. Acteurs réellement mobilisés
+    Décrire qui fait quoi réellement, en signalant les écarts de rôle par rapport
+    au prescrit (cumuls, délégations, suppléances, décisions hors périmètre).
+
+    ### 3. Contournements identifiés
+    Présenter sous forme de tableau avec les colonnes :
+    - Contournement observé
+    - Phase concernée
+    - Raison probable
+    - Fréquence estimée
+    - Impact sur la sécurité ou la traçabilité
+
+    ### 4. Doubles saisies et traitements hors système
+    Lister les opérations effectuées manuellement ou en dehors du SIH bloc.
+    Décrire les supports utilisés (Excel, cahier de bloc, papier, check-list manuelle).
+
+    ### 5. Coordinations informelles
+    Décrire les modes de coordination non prescrits entre services du bloc,
+    la réanimation, la stérilisation, le brancardage, la pharmacie ou les étages.
+
+    ### 6. Tensions programme / sécurité
+    Décrire les situations où la pression du programme opératoire conduit à
+    simplifier les contrôles prescrits, et leurs conséquences observées.
+
+    ### 7. Irritants opérationnels
+    Lister les points de friction vécus par les équipes (chirurgiens, anesthésistes,
+    IBODE, IADE, cadres), avec leur fréquence et leur impact sur la qualité de travail.
+
+    ### 8. Effets observés
+    Décrire les conséquences constatées sur : sécurité patient, traçabilité réglementaire
+    (DMI, stupéfiants, check-list), programme opératoire, codage CCAM, charge de travail.
+
 
 alignment_task:
   description: >
-    Compare l'analyse formelle et l'analyse réelle du bloc opératoire.
-    Identifie les désalignements socio-techniques,
-    qualifie leur nature, formule des hypothèses explicatives,
-    évalue les impacts opérationnels et propose des quick wins
-    ainsi que des actions structurantes.
+    Tu disposes de l'analyse formelle et de l'analyse réelle du bloc opératoire.
+    Ta mission est de produire une note de réalignement socio-technique qui identifie
+    les désalignements, en analyse les causes et propose des actions concrètes,
+    en plaçant la sécurité patient et la conformité réglementaire comme contraintes
+    prioritaires.
+
+    Tu dois couvrir les points suivants :
+    1. Mettre en regard le formel et le réel pour identifier les écarts significatifs.
+       Distinguer les désalignements selon leur nature : sécurité peropératoire,
+       conformité réglementaire, coordination interservices, valorisation des actes.
+    2. Pour chaque désalignement majeur, formuler une hypothèse explicative en croisant
+       les dimensions organisationnelle, fonctionnelle, technique et humaine.
+    3. Évaluer le niveau de risque : risque patient (incident peropératoire, erreur
+       d'identité, DMI non tracé), risque réglementaire (check-list non complète,
+       stupéfiants, CCAM), risque opérationnel (déprogrammation, retard, surcharge).
+    4. Proposer des quick wins : actions correctives réalisables sous 3 mois.
+       Prioriser absolument les actions qui réduisent un risque patient ou réglementaire.
+    5. Proposer des actions structurantes : changements de processus, paramétrages,
+       formations, interfaces, outils mobiles, nécessitant 3 à 18 mois.
+    6. Identifier les points de vigilance de gouvernance impliquant des arbitrages
+       entre la direction médicale, la DSI, la direction des soins et la direction générale.
+
+    Ta posture : la sécurité patient prime sur toute autre considération. Tu distingues
+    clairement les désalignements critiques des désalignements d'efficience.
+    Tu construis des recommandations réalistes, acceptables par les équipes médicales,
+    soignantes et administratives.
+
   expected_output: >
-    Une note de réalignement contenant :
-    synthèse du désalignement, écarts majeurs identifiés,
-    causes probables, impacts opérationnels,
-    quick wins, actions structurantes,
-    point de vigilance de gouvernance.
+    Une note de réalignement socio-technique bloc opératoire en Markdown,
+    comprenant les sections suivantes :
+
+    ## Note de réalignement — Bloc Opératoire
+
+    ### 1. Synthèse du désalignement
+    Résumer en quelques paragraphes l'écart global entre le processus formel
+    et les pratiques réelles. Qualifier le niveau de désalignement global
+    (faible / modéré / fort / critique) et ses principales conséquences sur
+    la sécurité patient, la conformité réglementaire et l'efficience du bloc.
+
+    ### 2. Écarts majeurs identifiés
+    Présenter sous forme de tableau avec les colonnes :
+    - Désalignement constaté
+    - Phase concernée
+    - Nature de l'écart (sécurité / réglementaire / fonctionnel / technique / humain)
+    - Cause probable
+    - Impact opérationnel
+    - Niveau de risque (faible / modéré / fort / critique)
+
+    ### 3. Analyse des causes probables
+    Développer les causes racines pour les désalignements les plus critiques.
+    Croiser les dimensions : organisationnelle, fonctionnelle, technique, humaine,
+    formation, paramétrage SIH, coordination interservices, gouvernance.
+
+    ### 4. Impacts consolidés par dimension de risque
+    Structurer les impacts selon trois niveaux :
+    - Risques sécurité patient : incidents peropératoires, erreurs d'identité, DMI non tracés
+    - Risques réglementaires : check-list HAS, stupéfiants, codage CCAM, compte rendu opératoire
+    - Risques opérationnels : déprogrammations, retards de programme, surcharge, perte de valorisation
+
+    ### 5. Quick wins recommandés
+    Présenter sous forme de tableau avec les colonnes :
+    - Action recommandée
+    - Désalignement ciblé
+    - Risque réduit
+    - Responsable pressenti
+    - Délai indicatif (< 3 mois)
+    - Difficulté estimée
+
+    ### 6. Actions structurantes recommandées
+    Présenter sous forme de tableau avec les colonnes :
+    - Action recommandée
+    - Désalignement ciblé
+    - Risque réduit
+    - Responsable pressenti
+    - Horizon (3-6 mois / 6-12 mois / 12-18 mois)
+    - Prérequis ou dépendances
+
+    ### 7. Points de vigilance de gouvernance
+    Lister les sujets nécessitant un arbitrage ou une attention particulière
+    de la direction médicale, de la DSI, de la direction des soins ou de la direction générale.
+    Identifier les sujets à inscrire en priorité à l'agenda du COPIL SIH ou du CLIN.
